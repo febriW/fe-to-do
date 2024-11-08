@@ -28,7 +28,9 @@ export const useAuthStore = defineStore('auth', {
 
             if(!data.error){
                 const token = useCookie('token')
+                const authorID = useCookie('authorID')
                 token.value = data.token
+                authorID.value = data.author_id
                 this.authenticated = true
             } else { this.msgError = data.error }
         },
@@ -49,10 +51,11 @@ export const useAuthStore = defineStore('auth', {
                 this.msgError = data.error
             }
         },
-        logout(){
+        async logout(){
             const token = useCookie('token')
             this.authenticated = false
             token.value = null
+            await navigateTo('/')
         }
     }
 })
