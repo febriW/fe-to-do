@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt', 'nuxtjs-naive-ui'],
+  modules: ['@pinia/nuxt', 'nuxtjs-naive-ui', '@nuxtjs/tailwindcss'],
   css: ['~/assets/styles/tailwind.css'],
   postcss: {
     plugins: {
