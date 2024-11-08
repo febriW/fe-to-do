@@ -19,6 +19,7 @@ interface Payload {
 export const useCardStore = defineStore('card', {
     state: () => ({
         data: [] as DataResponse[],
+        isLoading: false,
         msgError: ""
     }),
     
@@ -30,10 +31,41 @@ export const useCardStore = defineStore('card', {
                     Authorization: `Bearer `+ useCookie('token').value
                 }
             })
-
+            this.isLoading = true
             const data = await response.json()
             console.log("all data card fetch: ", data)
             this.data = data.Data
+            this.isLoading = false
+        },
+        async updateCard(data: DataResponse) {
+            const response = await fetch("http://127.0.0.1:8080/card", {
+                method: "put",
+                headers: {
+                    Authorization: `Bearer `+ useCookie('token').value
+                },
+                body: JSON.stringify(data)
+            })
+
+            this.isLoading = true
+            if(response.status !== 204) {
+                const responseData = await response.json()
+                this.msgError = responseData.error
+            }
+            this.isLoading = false
+        },
+        async deleteCard(id: string) {
+            const response = await fetch(`http://127.0.0.1:8080/card/${id}`, {
+                method: "delete",
+                headers: {
+                    Authorization: `Bearer `+ useCookie('token').value
+                },
+            })
+            this.isLoading = true
+            if(response.status !== 200) {
+                const responseData = await response.json()
+                this.msgError = responseData.error
+            }
+            this.isLoading = false
         }
     }
 })
