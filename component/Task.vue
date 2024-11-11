@@ -10,25 +10,25 @@
         <p>{{ props.task.content }}</p>
       </div>
       
-      <div class="flex flex-row gap-2">
+      <div class="flex flex-row gap-4">
         <n-button 
-          :disabled="task.marked_status === 'done'"
-          @click="markAsDone"
+          :disabled="task.marked_status === 'DONE'"
+          @click="markAsDone(task)"
           type="success" 
           size="small">
           Done
         </n-button>
         
         <n-button 
-          :disabled="task.marked_status === 'canceled'"
-          @click="markAsCanceled"
+          :disabled="task.marked_status === 'CANCELED'"
+          @click="markAsCanceled(task)"
           type="error" 
           size="small">
           Canceled
         </n-button>
         
         <n-button 
-          @click="deleteTask"
+          @click="deleteTask(task.activities_no)"
           type="default" 
           size="small">
           Delete
@@ -38,8 +38,9 @@
   </template>
   
 <script setup lang="ts">
-  import { ref } from 'vue';
   import { NCard, NButton } from 'naive-ui';
+  import { useCardStore } from '~/store/card';
+  import { defineEmits } from 'vue';
   
   interface Task {
     activities_no?: string
@@ -52,29 +53,43 @@
     updated_at?: string
   }
 
+  const emit = defineEmits(['dataFetched'])
   const props = defineProps<{ task: Task }>();
+  const { updateCard, deleteCard } = useCardStore()
   
-  // Define the task state
-  const task = ref<Task>({
-    title: 'Title of task',
-    content: 'Content of task',
-    marked_status: 'pending',
-  });
-  
-  const markAsDone = () => {
-    props.task.marked_status = 'done';
+  const markAsDone = async (task: Task) => {
+    const updatedTask: Task = {
+        author_id: task.author_id,
+        activities_no: task.activities_no,
+        title: task.title,
+        content: task.content,
+        marked_status: "DONE",
+        marked: new Date().toISOString().replace('T', ' ').slice(0, 19).toString()
+    };
+    const res = await updateCard(updatedTask)
   };
   
-  const markAsCanceled = () => {
-    props.task.marked_status = 'canceled';
+  const markAsCanceled = async (task: Task) => {
+    const updatedTask: Task = {
+        author_id: task.author_id,
+        activities_no: task.activities_no,
+        title: task.title,
+        content: task.content,
+        marked_status: "CANCELED",
+        marked: new Date().toISOString().replace('T', ' ').slice(0, 19).toString()
+    };
+    await updateCard(updatedTask)
   };
   
-  const deleteTask = () => {
-    props.task.marked_status = 'deleted'
+  const deleteTask = async (id?: string) => {
+    let res
+    if(id){
+      res = await deleteCard(id)
+    }
   };
 </script>
   
-  <style scoped>
+<style scoped>
   .task-card {
     max-width: 350px;
     margin: 20px;
@@ -89,4 +104,4 @@
   .card-content {
     margin: 10px 0;
   }
-  </style>
+</style>

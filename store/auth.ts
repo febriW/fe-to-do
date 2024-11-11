@@ -56,6 +56,7 @@ export const useAuthStore = defineStore('auth', {
             this.authenticated = false
             token.value = null
             await navigateTo('/')
+            window.location.reload()
         }
     }
 })
